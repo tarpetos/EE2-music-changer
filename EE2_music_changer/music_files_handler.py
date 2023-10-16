@@ -24,7 +24,9 @@ def add_main_path(main_path: str, filename: str) -> str:
     return os.path.join(main_path, filename)
 
 
-def get_music_files_paths(music_dir_path: str, file: Optional[FileType] = None) -> List[str]:
+def get_music_files_paths(
+    music_dir_path: str, file: Optional[FileType] = None
+) -> List[str]:
     file_list = get_music_files(music_dir_path)
     file_paths_list = list(
         map(lambda filename: add_main_path(music_dir_path, filename), file_list)

@@ -8,7 +8,8 @@ class CustomLogger:
         if not self.logger.handlers:
             self.logger.setLevel(logging.DEBUG)
             formatter = logging.Formatter(
-                "%(asctime)s %(name)s %(levelname)s: | %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
+                "%(asctime)s %(name)s %(levelname)s: | %(message)s",
+                datefmt="%Y-%m-%d %H:%M:%S",
             )
 
             ch = logging.StreamHandler()

@@ -19,7 +19,9 @@ class EE2MusicChanger:
             music_files = get_music_files(music_path)
             music_files_paths = get_music_files_paths(music_path, self.GAME_FILE)
             custom_files = get_music_files(custom_music_path)
-            custom_files_paths = get_music_files_paths(custom_music_path, self.CUSTOM_FILE)
+            custom_files_paths = get_music_files_paths(
+                custom_music_path, self.CUSTOM_FILE
+            )
         except IndexError:
             self.MAIN_LOGGER.show_error("Path is empty or invalid!")
             return None
@@ -40,4 +42,6 @@ class EE2MusicChanger:
                 self._replace()
                 break
 
-            self.MAIN_LOGGER.show_warning("Invalid input! Must be '0' or '1'. Try again.")
+            self.MAIN_LOGGER.show_warning(
+                "Invalid input! Must be '0' or '1'. Try again."
+            )

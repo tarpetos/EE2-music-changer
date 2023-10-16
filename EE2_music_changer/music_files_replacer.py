@@ -66,7 +66,10 @@ def replace_music(
                 )
                 os.rename(custom_music_path, new_filename_path)
                 REPLACER_LOGGER.show_info(
-                    "Renamed file #%d: from '%s' to '%s'", (index + 1), custom_music_path, new_filename_path
+                    "Renamed file #%d: from '%s' to '%s'",
+                    (index + 1),
+                    custom_music_path,
+                    new_filename_path,
                 )
 
         REPLACER_LOGGER.show_info(

@@ -36,7 +36,7 @@ def default_music_folder_check() -> None:
 
 
 def custom_compress(
-        input_file: str, output_file: str, bitrate: str = DEFAULT_BITRATE
+    input_file: str, output_file: str, bitrate: str = DEFAULT_BITRATE
 ) -> None:
     audio = AudioSegment.from_mp3(input_file)
     audio = (
@@ -92,7 +92,9 @@ def selenium_compress(input_file: str, filename: str) -> None:
     driver.quit()
 
 
-def selenium_file_downloading(driver: webdriver.Chrome, filename: str, dir_name: str) -> None:
+def selenium_file_downloading(
+    driver: webdriver.Chrome, filename: str, dir_name: str
+) -> None:
     start_time = time.perf_counter()
     downloaded_filename = filename.replace("_", "-")
     while time.perf_counter() - start_time < SELENIUM_LOAD_TIMEOUT:
@@ -128,7 +130,10 @@ def search_default_music_files() -> List[str]:
 
 def compress(compression_option: CompressionType) -> None:
     main_path = os.path.join(
-        os.path.expanduser("~"), "Music", "music_ee2_default", "Ambient"  # insert path to default EE2 mp3 files
+        os.path.expanduser("~"),
+        "Music",
+        "music_ee2_default",
+        "Ambient",  # insert path to default EE2 mp3 files
     )
     default_music_folder_check()
     music = get_music_files(main_path)
@@ -140,7 +145,9 @@ def compress(compression_option: CompressionType) -> None:
         save_path = os.path.join(SAVE_DIR, current_audio)
         progress = round((100 * (index + 1)) / GAME_MUSIC_NUMBER, 2)
         if current_audio in saved_music:
-            COMPRESSOR_LOGGER.show_info("%.2f%% (%s already compressed). Skipped.)", progress, current_audio)
+            COMPRESSOR_LOGGER.show_info(
+                "%.2f%% (%s already compressed). Skipped.)", progress, current_audio
+            )
             continue
 
         if compression_option == "custom":
@@ -149,7 +156,9 @@ def compress(compression_option: CompressionType) -> None:
             )
         else:
             selenium_compress_loop(file_path, current_audio)
-            COMPRESSOR_LOGGER.show_info("%.2f%% (%s compressed)", progress, current_audio)
+            COMPRESSOR_LOGGER.show_info(
+                "%.2f%% (%s compressed)", progress, current_audio
+            )
 
 
 def decompress(change_bit_rate: bool = False) -> None:
@@ -167,4 +176,6 @@ def decompress(change_bit_rate: bool = False) -> None:
         else:
             shutil.copy(saved_file, game_file_path)
 
-        COMPRESSOR_LOGGER.show_info("%.2f%% (%s placed into game folder)", progress, current_audio)
+        COMPRESSOR_LOGGER.show_info(
+            "%.2f%% (%s placed into game folder)", progress, current_audio
+        )
