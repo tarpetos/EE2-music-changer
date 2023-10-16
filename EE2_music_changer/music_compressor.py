@@ -1,7 +1,7 @@
 import os
 import shutil
 import time
-from typing import Type, Literal, List
+from typing import List
 from pydub import AudioSegment
 from selenium import webdriver
 from selenium.common import TimeoutException
@@ -9,7 +9,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 
-from custom_logger import CustomLogger
+from .custom_logger import CustomLogger
 from .constants import (
     FRAME_RATE,
     CHANNEL_NUMER,
@@ -22,15 +22,12 @@ from .constants import (
     GAME_MUSIC_NUMBER,
     SELENIUM_LOAD_TIMEOUT,
 )
-from . import (
-    get_music_files_paths,
-    get_music_files,
-    find_ambient_dir_path,
-)
+from .music_files_handler import get_music_files, get_music_files_paths
+from .music_path_handler import find_ambient_dir_path
+from .types import CompressionType
 
 COMPRESSOR_LOGGER = CustomLogger("REPLACER_LOGGER")
 SAVE_DIR = os.path.join(MAIN_FOLDER_NAME, RESET_MUSIC_FOLDER_NAME)
-CompressionType: Type[str] = Literal["custom", "selenium"]
 
 
 def default_music_folder_check() -> None:
@@ -39,7 +36,7 @@ def default_music_folder_check() -> None:
 
 
 def custom_compress(
-    input_file: str, output_file: str, bitrate: str = DEFAULT_BITRATE
+        input_file: str, output_file: str, bitrate: str = DEFAULT_BITRATE
 ) -> None:
     audio = AudioSegment.from_mp3(input_file)
     audio = (
@@ -90,6 +87,12 @@ def selenium_compress(input_file: str, filename: str) -> None:
     )
     download.click()
 
+    selenium_file_downloading(driver, filename, dir_name)
+
+    driver.quit()
+
+
+def selenium_file_downloading(driver: webdriver.Chrome, filename: str, dir_name: str) -> None:
     start_time = time.perf_counter()
     downloaded_filename = filename.replace("_", "-")
     while time.perf_counter() - start_time < SELENIUM_LOAD_TIMEOUT:
@@ -102,8 +105,6 @@ def selenium_compress(input_file: str, filename: str) -> None:
             )
             break
         time.sleep(1)
-
-    driver.quit()
 
 
 def selenium_compress_loop(file_path: str, current_audio: str) -> None:

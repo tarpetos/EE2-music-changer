@@ -4,7 +4,7 @@ import tkinter as tk
 from tkinter import filedialog
 from typing import Optional
 
-from custom_logger import CustomLogger
+from EE2_music_changer.custom_logger import CustomLogger
 from .constants import (
     OS_LINUX,
     OS_WINDOWS,

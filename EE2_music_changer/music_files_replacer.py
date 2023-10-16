@@ -3,7 +3,7 @@ import shutil
 from random import choice
 from typing import List
 
-from custom_logger import CustomLogger
+from EE2_music_changer.custom_logger import CustomLogger
 from .constants import GAME_MUSIC_NUMBER
 from .music_path_handler import get_platform_slash
 
