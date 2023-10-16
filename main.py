@@ -4,8 +4,11 @@ from EE2_music_changer import (
     get_music_files,
     get_music_files_paths,
     replace_music,
-    decompress
+    decompress,
 )
+from custom_logger import CustomLogger
+
+MAIN_LOGGER = CustomLogger("MAIN_LOGGER")
 
 
 def replace() -> None:
@@ -13,18 +16,16 @@ def replace() -> None:
     custom_music_path = find_custom_dir_path()
 
     try:
-        print("\nMusic files:", music_files := get_music_files(music_path))
-        print(
-            "Music files paths:", music_files_paths := get_music_files_paths(music_path)
-        )
-        print("Custom files:", custom_files := get_music_files(custom_music_path))
-        print(
-            "Custom files paths:",
-            custom_files_paths := get_music_files_paths(custom_music_path),
-            "\n",
-        )
+        music_files = get_music_files(music_path)
+        music_files_paths = get_music_files_paths(music_path)
+        custom_files = get_music_files(custom_music_path)
+        custom_files_paths = get_music_files_paths(custom_music_path)
+        MAIN_LOGGER.show_info("Music files: %s", music_files)
+        MAIN_LOGGER.show_info("Music files paths: %s", music_files_paths)
+        MAIN_LOGGER.show_info("Custom files: %s", custom_files)
+        MAIN_LOGGER.show_info("Custom files paths: %s", custom_files_paths)
     except IndexError:
-        print("Path is empty or invalid!")
+        MAIN_LOGGER.show_error("Path is empty or invalid!")
         return None
     replace_music(music_files, custom_files, music_files_paths, custom_files_paths)
 
@@ -44,7 +45,7 @@ def process_user_option() -> None:
             replace()
             break
 
-        print("Invalid input! Must be '0' or '1'. Try again.\n")
+        MAIN_LOGGER.show_warning("Invalid input! Must be '0' or '1'. Try again.")
 
 
 def main() -> None:

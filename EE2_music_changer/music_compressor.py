@@ -8,13 +8,27 @@ from selenium.common import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions
-from .constants import (
-    FRAME_RATE, CHANNEL_NUMER, SAMPLE_WIDTH,
-    AVAILABLE_MUSIC_EXTENSION, COMPRESSION_BITRATE, RESET_MUSIC_FOLDER_NAME,
-    MAIN_FOLDER_NAME, DEFAULT_BITRATE, GAME_MUSIC_NUMBER,
-)
-from . import get_music_files_paths, get_music_files, find_ambient_dir_path
 
+from custom_logger import CustomLogger
+from .constants import (
+    FRAME_RATE,
+    CHANNEL_NUMER,
+    SAMPLE_WIDTH,
+    AVAILABLE_MUSIC_EXTENSION,
+    COMPRESSION_BITRATE,
+    RESET_MUSIC_FOLDER_NAME,
+    MAIN_FOLDER_NAME,
+    DEFAULT_BITRATE,
+    GAME_MUSIC_NUMBER,
+    SELENIUM_LOAD_TIMEOUT,
+)
+from . import (
+    get_music_files_paths,
+    get_music_files,
+    find_ambient_dir_path,
+)
+
+COMPRESSOR_LOGGER = CustomLogger("REPLACER_LOGGER")
 SAVE_DIR = os.path.join(MAIN_FOLDER_NAME, RESET_MUSIC_FOLDER_NAME)
 CompressionType: Type[str] = Literal["custom", "selenium"]
 
@@ -24,14 +38,19 @@ def default_music_folder_check() -> None:
         os.makedirs(SAVE_DIR)
 
 
-def custom_compress(input_file: str, output_file: str, bitrate: str = DEFAULT_BITRATE) -> None:
+def custom_compress(
+    input_file: str, output_file: str, bitrate: str = DEFAULT_BITRATE
+) -> None:
     audio = AudioSegment.from_mp3(input_file)
-    audio = audio.set_frame_rate(FRAME_RATE).set_channels(CHANNEL_NUMER).set_sample_width(SAMPLE_WIDTH)
+    audio = (
+        audio.set_frame_rate(FRAME_RATE)
+        .set_channels(CHANNEL_NUMER)
+        .set_sample_width(SAMPLE_WIDTH)
+    )
     audio.export(output_file, format=AVAILABLE_MUSIC_EXTENSION, bitrate=bitrate)
 
 
 def selenium_compress(input_file: str, filename: str) -> None:
-    load_timeout = 60
     dir_name = os.path.abspath(SAVE_DIR)
 
     chrome_options = webdriver.ChromeOptions()
@@ -41,16 +60,16 @@ def selenium_compress(input_file: str, filename: str) -> None:
             "download.default_directory": dir_name,
         },
     )
-    # chrome_options.add_argument("--no-sandbox")
-    # chrome_options.add_argument("--headless")
-    # chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--disable-gpu")
 
     driver = webdriver.Chrome(options=chrome_options)
     driver.get("https://www.onlineconverter.com/compress-mp3")
 
     upload_file_button_xpath = "//input[@type='file']"
 
-    file_input = WebDriverWait(driver, load_timeout).until(
+    file_input = WebDriverWait(driver, SELENIUM_LOAD_TIMEOUT).until(
         expected_conditions.presence_of_element_located(
             (By.XPATH, upload_file_button_xpath)
         )
@@ -58,7 +77,7 @@ def selenium_compress(input_file: str, filename: str) -> None:
     file_input.send_keys(input_file)
 
     convert_button_xpath = "//input[@type='button']"
-    convert_button = WebDriverWait(driver, load_timeout).until(
+    convert_button = WebDriverWait(driver, SELENIUM_LOAD_TIMEOUT).until(
         expected_conditions.presence_of_element_located(
             (By.XPATH, convert_button_xpath)
         )
@@ -66,22 +85,20 @@ def selenium_compress(input_file: str, filename: str) -> None:
     convert_button.click()
 
     download_xpath = "//div[@id='message']//a"
-    download = WebDriverWait(driver, load_timeout).until(
-        expected_conditions.presence_of_element_located(
-            (By.XPATH, download_xpath)
-        )
+    download = WebDriverWait(driver, SELENIUM_LOAD_TIMEOUT).until(
+        expected_conditions.presence_of_element_located((By.XPATH, download_xpath))
     )
     download.click()
 
     start_time = time.perf_counter()
     downloaded_filename = filename.replace("_", "-")
-    while time.perf_counter() - start_time < load_timeout:
-        print("Downloading...")
+    while time.perf_counter() - start_time < SELENIUM_LOAD_TIMEOUT:
+        COMPRESSOR_LOGGER.show_info("Downloading %s...", filename)
         webdriver.ActionChains(driver).move_by_offset(0, 0).click().perform()
         if downloaded_filename in os.listdir(dir_name):
             os.rename(
                 src=os.path.join(dir_name, downloaded_filename),
-                dst=os.path.join(dir_name, filename)
+                dst=os.path.join(dir_name, filename),
             )
             break
         time.sleep(1)
@@ -94,17 +111,24 @@ def selenium_compress_loop(file_path: str, current_audio: str) -> None:
         try:
             selenium_compress(input_file=file_path, filename=current_audio)
             break
-        except TimeoutException:
+        except TimeoutException as e:
+            COMPRESSOR_LOGGER.show_error("%s", e)
             continue
 
 
 def search_default_music_files() -> List[str]:
-    saved_music = [file for file in os.listdir(SAVE_DIR) if file.endswith(AVAILABLE_MUSIC_EXTENSION)]
+    saved_music = [
+        file
+        for file in os.listdir(SAVE_DIR)
+        if file.endswith(AVAILABLE_MUSIC_EXTENSION)
+    ]
     return saved_music
 
 
 def compress(compression_option: CompressionType) -> None:
-    main_path = os.path.join(os.path.expanduser("~"), "Music", "music_ee2_default", "Ambient")
+    main_path = os.path.join(
+        os.path.expanduser("~"), "Music", "music_ee2_default", "Ambient"  # insert path to default EE2 mp3 files
+    )
     default_music_folder_check()
     music = get_music_files(main_path)
     paths = get_music_files_paths(main_path)
@@ -113,15 +137,18 @@ def compress(compression_option: CompressionType) -> None:
     for index, file_path in enumerate(paths):
         current_audio = music[index]
         save_path = os.path.join(SAVE_DIR, current_audio)
+        progress = round((100 * (index + 1)) / GAME_MUSIC_NUMBER, 2)
         if current_audio in saved_music:
-            print(f"{(100 * (index + 1)) / GAME_MUSIC_NUMBER:.2f}% ({current_audio} already compressed). Skipped.")
+            COMPRESSOR_LOGGER.show_info("%.2f%% (%s already compressed). Skipped.)", progress, current_audio)
             continue
 
         if compression_option == "custom":
-            custom_compress(input_file=file_path, output_file=save_path, bitrate=COMPRESSION_BITRATE)
+            custom_compress(
+                input_file=file_path, output_file=save_path, bitrate=COMPRESSION_BITRATE
+            )
         else:
             selenium_compress_loop(file_path, current_audio)
-        print(f"{(100 * (index + 1)) / GAME_MUSIC_NUMBER:.2f}% ({current_audio} compressed)")
+            COMPRESSOR_LOGGER.show_info("%.2f%% (%s compressed)", progress, current_audio)
 
 
 def decompress(change_bit_rate: bool = False) -> None:
@@ -133,8 +160,10 @@ def decompress(change_bit_rate: bool = False) -> None:
         current_audio = music[index]
         saved_file = os.path.join(SAVE_DIR, current_audio)
         game_file_path = os.path.join(music_path, current_audio)
+        progress = (100 * (index + 1)) / GAME_MUSIC_NUMBER
         if change_bit_rate:
             custom_compress(input_file=saved_file, output_file=game_file_path)
         else:
             shutil.copy(saved_file, game_file_path)
-        print(f"{(100 * (index + 1)) / GAME_MUSIC_NUMBER:.2f}% placed into game folder ({current_audio})")
+
+        COMPRESSOR_LOGGER.show_info("%.2f%% (%s placed into game folder)", progress, current_audio)
