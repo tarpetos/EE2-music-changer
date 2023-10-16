@@ -4,7 +4,7 @@ from random import choice
 from typing import List
 
 from .constants import GAME_MUSIC_NUMBER
-from .find_music_path import get_platform_slash
+from .music_path_handler import get_platform_slash
 
 
 def has_same_names(game_files: List[str], custom_files: List[str]) -> bool:
@@ -43,9 +43,11 @@ def replace_music(
     for index in range(loop_range):
         custom_music_path = custom_files_paths[index]
         print(f"Custom file #{index + 1}:", custom_music_path)
+
         if custom_files[index] in game_files:
             original_music_path_index = game_files.index(custom_files[index])
-            shutil.copy(custom_music_path, game_files_paths[original_music_path_index])
+            original_music_path = game_files_paths[original_music_path_index]
+            shutil.copy(custom_music_path, original_music_path)
         else:
             original_music_path = choice(game_files_paths)
             shutil.copy(custom_music_path, original_music_path)
@@ -53,6 +55,10 @@ def replace_music(
             if rename_flag:
                 slash = get_platform_slash()
                 custom_dir_path_list = custom_files_paths[0].split(slash)[:-1]
+                original_music_filename = original_music_path.split(slash)[-1]
                 custom_dir_path = os.path.join(slash, *custom_dir_path_list)
-                new_filename_path = os.path.join(custom_dir_path, game_files[index])
+                new_filename_path = os.path.join(custom_dir_path, original_music_filename)
+                print(new_filename_path)
                 os.rename(custom_music_path, new_filename_path)
+
+        print(f"Replaced file #{index + 1}:", original_music_path, "\n")

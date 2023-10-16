@@ -31,9 +31,9 @@ def custom_path() -> str:
 
 
 def get_platform_start_path() -> Optional[str]:
-    if platform.system() == OS_WINDOWS:
+    if platform.system() == OS_LINUX:
         return os.path.join(os.path.expanduser("~"), ".wine", "drive_c")
-    elif platform.system() == OS_LINUX:
+    elif platform.system() == OS_WINDOWS:
         return custom_path()
 
 

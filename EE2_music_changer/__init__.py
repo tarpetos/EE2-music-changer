@@ -1,6 +1,7 @@
-from .find_music_path import find_ambient_dir_path, find_custom_dir_path
-from .get_music_files import get_music_files, get_music_files_paths
-from .replace_files import replace_music
+from .music_path_handler import find_ambient_dir_path, find_custom_dir_path
+from .music_files_handler import get_music_files, get_music_files_paths
+from .music_files_replacer import replace_music
+from .music_compressor import compress, decompress
 
 __all__ = (
     "find_ambient_dir_path",
@@ -8,4 +9,6 @@ __all__ = (
     "get_music_files",
     "get_music_files_paths",
     "replace_music",
+    "compress",
+    "decompress",
 )
