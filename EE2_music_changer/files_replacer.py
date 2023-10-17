@@ -5,8 +5,7 @@ from typing import List
 
 from EE2_music_changer.custom_logger import CustomLogger
 from .constants import GAME_MUSIC_NUMBER
-from .music_path_handler import get_platform_slash
-
+from .path_handler import get_platform_slash
 
 REPLACER_LOGGER = CustomLogger("REPLACER_LOGGER")
 
@@ -34,11 +33,15 @@ def set_range(custom_files: List[str]) -> int:
     return custom_music_number
 
 
+def replace_file(input_path: str, output_path: str) -> None:
+    shutil.copy(input_path, output_path)
+
+
 def replace_music(
-    game_files: List[str],
-    custom_files: List[str],
-    game_files_paths: List[str],
-    custom_files_paths: List[str],
+        game_files: List[str],
+        custom_files: List[str],
+        game_files_paths: List[str],
+        custom_files_paths: List[str],
 ) -> None:
     has_same = has_same_names(game_files, custom_files)
     rename_flag = rename_option_selected(has_same)
@@ -51,10 +54,10 @@ def replace_music(
         if custom_files[index] in game_files:
             original_music_path_index = game_files.index(custom_files[index])
             original_music_path = game_files_paths[original_music_path_index]
-            shutil.copy(custom_music_path, original_music_path)
+            replace_file(custom_music_path, original_music_path)
         else:
             original_music_path = choice(game_files_paths)
-            shutil.copy(custom_music_path, original_music_path)
+            replace_file(custom_music_path, original_music_path)
 
             if rename_flag:
                 slash = get_platform_slash()

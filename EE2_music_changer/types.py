@@ -1,4 +1,4 @@
 from typing import Type, Literal
 
 FileType: Type[str] = Literal["Game", "Custom"]
-CompressionType: Type[str] = Literal["custom", "selenium"]
+CompressorOption: Type[str] = Literal["custom_compress", "selenium_compress", "decompress", "reset"]

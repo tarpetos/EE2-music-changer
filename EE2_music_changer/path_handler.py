@@ -13,6 +13,7 @@ from .constants import (
     EXE_FILE_NANE,
     AMBIENT_FOLDER_NAME,
     DEFAULT_CUSTOM_DIR,
+    SAVE_DIR,
 )
 
 PATH_LOGGER = CustomLogger("PATH_LOGGER")
@@ -83,3 +84,8 @@ def find_custom_dir_path() -> str:
     PATH_LOGGER.show_info("Custom music path: %s", custom_dir_path)
 
     return custom_dir_path
+
+
+def default_music_folder_check() -> None:
+    if not os.path.exists(SAVE_DIR):
+        os.makedirs(SAVE_DIR)
