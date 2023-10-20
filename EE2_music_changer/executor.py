@@ -1,51 +1,29 @@
+import platform
+
+import flet as ft
+
+from .app_ui import App, AppConfig
 from .custom_logger import CustomLogger
-from .audio_compressor import CompressorOptionSelector
-from .files_handler import get_music_files, get_music_files_paths
-from .files_replacer import replace_music
-from .path_handler import find_ambient_dir_path, find_custom_dir_path
-from .types import FileType
+from .utils.constants import OS_LINUX, OS_WINDOWS
 
 
 class EE2MusicChanger:
     MAIN_LOGGER = CustomLogger("MAIN_LOGGER")
-    GAME_FILE: FileType = "Game"
-    CUSTOM_FILE: FileType = "Custom"
+    DEFAULT_APP_TITLE = "EE2 Music Changer"
 
-    def _replace(self) -> None:
-        music_path = find_ambient_dir_path()
-        custom_music_path = find_custom_dir_path()
+    def __init__(self, app_title: str = DEFAULT_APP_TITLE):
+        self.title = app_title
 
-        music_files = get_music_files(music_path)
-        music_files_paths = get_music_files_paths(music_path, self.GAME_FILE)
-        custom_files = get_music_files(custom_music_path)
-        custom_files_paths = get_music_files_paths(
-            custom_music_path, self.CUSTOM_FILE
-        )
-        replace_music(music_files, custom_files, music_files_paths, custom_files_paths)
-
-    def process_option_loop(self) -> None:
-        while True:
-            user_input = input(
-                "Would you like to reset EE2 music to default or to change default music to custom music?\n"
-                "0 - reset to default\n"
-                "1 - change to custom\n"
-                ">>>> "
-            )
-            if user_input == "0":
-                option_selector = CompressorOptionSelector()
-                option_selector.select("reset")
-                break
-            elif user_input == "1":
-                self._replace()
-                break
-
-            self.MAIN_LOGGER.show_warning(
-                "Invalid input! Must be '0' or '1'. Try again."
+    def _init_ui(self, page: ft.Page) -> None:
+        config = AppConfig(page, title=self.title)
+        if platform.system() in (OS_LINUX, OS_WINDOWS):
+            page.add(App((config.game_file_picker, config.custom_file_picker)))
+        else:
+            page.add(
+                ft.Text("This application can only work on Linux distributions (Wine is required) and Windows OS.")
             )
 
-    def process_user_option(self) -> None:
-        try:
-            self.process_option_loop()
-        except IndexError:
-            self.MAIN_LOGGER.show_error("Path is empty or invalid!")
-            return None
+    def start_app(self) -> None:
+        self.MAIN_LOGGER.show_info("FLET APPLICATION STARTED")
+        ft.app(target=self._init_ui)
+        self.MAIN_LOGGER.show_info("FLET APPLICATION CLOSED")
