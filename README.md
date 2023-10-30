@@ -10,7 +10,7 @@ allowing users to customize the in-game music according to their preferences.
 ## Features
 
 - **Music Replacement**: Replace in-game music with custom audio files.
-- **Path Management**: Automatically find paths for various directories related to the game and custom music.
+- **Path Management**: Automatically find paths for directories related to the game and custom music.
 - **Music Compression**: Has functions to compress MP3 files to make it smaller.
 
 ## How to Use

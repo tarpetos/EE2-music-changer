@@ -9,7 +9,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 
-from .constants import (
+from EE2_music_changer.constants import (
     AVAILABLE_MUSIC_EXTENSION,
     GAME_MUSIC_NUMBER,
     RESET_MUSIC_FOLDER_NAME,
@@ -21,7 +21,7 @@ from .files_handler import (
 )
 from .files_replacer import replace_file
 from .paths_handler import find_ambient_dir_path, default_music_folder_check
-from .types import CompressorOption, CompressorOptionString
+from ..types import CompressorOption, CompressorOptionString
 from ..custom_logger import CustomLogger
 
 COMPRESSOR_LOGGER = CustomLogger("REPLACER_LOGGER")
@@ -168,7 +168,7 @@ class CompressorOptionSelector:
                     "%.2f%% (%s placed into game folder)", progress, current_audio
                 )
 
-    def select(self, option: CompressorOptionString) -> None:
+    def select(self, option: CompressorOptionString, game_music_path: Optional[str] = None) -> None:
         if option == CompressorOption.CUSTOM_COMPRESS or option == CompressorOption.SELENIUM_COMPRESS:
             main_path = os.path.join(
                 os.path.expanduser("~"),
@@ -184,5 +184,4 @@ class CompressorOptionSelector:
         else:
             paths = get_music_files_paths(RESET_MUSIC_FOLDER_NAME)
             music = get_music_files(RESET_MUSIC_FOLDER_NAME)
-            music_path = find_ambient_dir_path()
-            self._base(option, paths, music, game_music_path=music_path)
+            self._base(option, paths, music, game_music_path=game_music_path)

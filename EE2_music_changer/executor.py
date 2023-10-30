@@ -4,7 +4,7 @@ import flet as ft
 
 from .app_ui import App, AppConfig
 from .custom_logger import CustomLogger
-from .utils.constants import OS_LINUX, OS_WINDOWS
+from .constants import OS_LINUX, OS_WINDOWS
 
 
 class EE2MusicChanger:

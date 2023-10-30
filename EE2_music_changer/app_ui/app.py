@@ -3,11 +3,20 @@ from typing import Optional, Tuple
 import flet as ft
 
 from .callbacks import CallbackHandler
-from ..utils.constants import AMBIENT_FOLDER_NAME, MUSIC_CUSTOM_FOLDER_NAME
+from ..constants import AMBIENT_FOLDER_NAME, MUSIC_CUSTOM_FOLDER_NAME
 from ..utils.paths_handler import find_ambient_dir_path, find_custom_dir_path
 
 
 class App(CallbackHandler):
+    # TODO: Fix reset button path selection +
+    # TODO: Remove possibility to select random dirs +
+    # TODO: Fix bug with repeated replacement of the same files +
+    # TODO: Fix cross-platform support +-
+    # TODO: Add MP3 compressor mode
+    # TODO: Add possibility to somehow replace music for each epoch
+    # TODO: Fix path selector height
+    # TODO: Add clever replacement with drag and drop music selection
+
     ROW_SPACING = 20
     COLUMN_SPACING = 50
     TEXT_BUTTON_BORDER_RADIUS = 0
@@ -40,7 +49,7 @@ class App(CallbackHandler):
         self.reset_button = ft.ElevatedButton(
             text="Reset music",
             expand=True,
-            on_click=lambda event: self.reset_button_callback(event),
+            on_click=lambda event: self.reset_button_callback(event, self.game_path_input),
             tooltip="Overwrites 81 game music files with original music files.",
         )
 
@@ -74,7 +83,7 @@ class App(CallbackHandler):
                     ft.MaterialState.DEFAULT: ft.RoundedRectangleBorder(radius=self.TEXT_BUTTON_BORDER_RADIUS),
                 },
             ),
-            tooltip=f"Specify the absolute path to the game music folder called '{AMBIENT_FOLDER_NAME}'."
+            tooltip=f"Specify the absolute path to the EE2 root folder."
         )
 
         self.custom_path_input = ft.TextField(
@@ -102,7 +111,7 @@ class App(CallbackHandler):
         self.rows = [
             self.row_builder(self.change_button, self.dark_mode_checkbox, self.reset_button),
             self.row_builder(self.game_path_input, self.game_path_button, spacing=None),
-            self.row_builder(self.custom_path_input, self.custom_path_button, spacing=None)
+            self.row_builder(self.custom_path_input, spacing=None)
         ]
 
     def row_builder(self, *controls: ft.Control, spacing: Optional[int] = ROW_SPACING) -> ft.Row:
@@ -121,3 +130,5 @@ class App(CallbackHandler):
 
     def build(self) -> ft.Column:
         return self.column_builder(*self.rows)
+
+

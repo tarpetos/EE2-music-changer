@@ -1,8 +1,8 @@
 import os
 from typing import List, Optional
 
-from .constants import AVAILABLE_MUSIC_EXTENSION, RESET_MUSIC_FOLDER_NAME
-from .types import FileTypeString
+from ..constants import AVAILABLE_MUSIC_EXTENSION, RESET_MUSIC_FOLDER_NAME
+from ..types import FileTypeString
 from ..custom_logger import CustomLogger
 
 FILE_LOGGER = CustomLogger("FILE_LOGGER")
@@ -34,6 +34,7 @@ def get_music_files_paths(
     if file:
         FILE_LOGGER.show_info("%s files: %s", file, file_list)
         FILE_LOGGER.show_info("%s files paths: %s", file, file_paths_list)
+
     return file_paths_list
 
 
@@ -43,6 +44,7 @@ def search_default_music_files() -> List[str]:
         for file in os.listdir(RESET_MUSIC_FOLDER_NAME)
         if file.endswith(AVAILABLE_MUSIC_EXTENSION)
     ]
+
     return saved_music
 
 
