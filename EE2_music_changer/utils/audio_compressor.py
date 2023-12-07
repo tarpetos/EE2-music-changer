@@ -133,16 +133,16 @@ class CompressorOptionSelector:
         saved_music_files: Optional[List[str]] = "",
         game_music_path: Optional[str] = "",
     ) -> None:
-        compression_options = (CompressorOption.CUSTOM_COMPRESS, CompressorOption.SELENIUM_COMPRESS)
+        compression_options = (
+            CompressorOption.CUSTOM_COMPRESS,
+            CompressorOption.SELENIUM_COMPRESS,
+        )
         decompression_options = (CompressorOption.DECOMPRESS, CompressorOption.RESET)
         for index, file_path in enumerate(paths):
             current_audio = music_files[index]
             save_path = os.path.join(RESET_MUSIC_FOLDER_NAME, current_audio)
             progress = (100 * (index + 1)) / GAME_MUSIC_NUMBER
-            if (
-                current_audio in saved_music_files
-                and option in compression_options
-            ):
+            if current_audio in saved_music_files and option in compression_options:
                 COMPRESSOR_LOGGER.show_info(
                     "%.2f%% (%s already compressed). Skipped.", progress, current_audio
                 )
@@ -168,8 +168,13 @@ class CompressorOptionSelector:
                     "%.2f%% (%s placed into game folder)", progress, current_audio
                 )
 
-    def select(self, option: CompressorOptionString, game_music_path: Optional[str] = None) -> None:
-        if option == CompressorOption.CUSTOM_COMPRESS or option == CompressorOption.SELENIUM_COMPRESS:
+    def select(
+        self, option: CompressorOptionString, game_music_path: Optional[str] = None
+    ) -> None:
+        if (
+            option == CompressorOption.CUSTOM_COMPRESS
+            or option == CompressorOption.SELENIUM_COMPRESS
+        ):
             main_path = os.path.join(
                 os.path.expanduser("~"),
                 "Music",

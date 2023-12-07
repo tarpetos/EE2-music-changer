@@ -25,7 +25,7 @@ def add_main_path(main_path: str, filename: str) -> str:
 
 
 def get_music_files_paths(
-        music_dir_path: str, file: Optional[FileTypeString] = None
+    music_dir_path: str, file: Optional[FileTypeString] = None
 ) -> List[str]:
     file_list = get_music_files(music_dir_path)
     file_paths_list = list(

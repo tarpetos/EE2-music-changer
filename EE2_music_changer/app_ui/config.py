@@ -16,7 +16,8 @@ class AppConfig:
         self.page.padding = self.PADDING
         self.page.vertical_alignment = ft.MainAxisAlignment.CENTER
         self.page.horizontal_alignment = ft.MainAxisAlignment.CENTER
-        self.page.dark_theme = ft.Theme(color_scheme_seed=ft.colors.INDIGO_ACCENT)
+        self.page.theme = ft.Theme(color_scheme_seed=ft.colors.TEAL_ACCENT_700)
+        self.page.dark_theme = ft.Theme(color_scheme_seed=ft.colors.TEAL_ACCENT_700)
         self.game_file_picker = ft.FilePicker()
         self.custom_file_picker = ft.FilePicker()
         self.page.overlay.append(self.game_file_picker)

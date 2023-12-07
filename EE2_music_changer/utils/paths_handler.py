@@ -98,4 +98,6 @@ def default_music_folder_check() -> None:
 
 
 def is_game_folder_selected(selected_path: str) -> bool:
-    return all(item in os.listdir(selected_path) for item in [EXE_FILE_NAME, MUSIC_FOLDER_NAME])
+    return all(
+        item in os.listdir(selected_path) for item in [EXE_FILE_NAME, MUSIC_FOLDER_NAME]
+    )
