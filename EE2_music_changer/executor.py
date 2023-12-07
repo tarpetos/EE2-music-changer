@@ -20,7 +20,9 @@ class EE2MusicChanger:
             page.add(App((config.game_file_picker, config.custom_file_picker)))
         else:
             page.add(
-                ft.Text("This application can only work on Linux distributions (Wine is required) and Windows OS.")
+                ft.Text(
+                    "This application can only work on Linux distributions (Wine is required) and Windows OS."
+                )
             )
 
     def start_app(self) -> None:

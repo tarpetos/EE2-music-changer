@@ -2,29 +2,30 @@ import os
 import flet as ft
 from typing import List
 
-from ..constants import (
+from EE2_music_changer.constants import (
     GAME_MUSIC_NUMBER,
     DEFAULT_CUSTOM_DIR,
     MUSIC_CUSTOM_FOLDER_NAME,
     MUSIC_FOLDER_NAME,
     AMBIENT_FOLDER_NAME,
 )
-from ..types import FileType, FileTypeString, CompressorOption, CompressorOptionString
-from ..utils.paths_handler import (
+from EE2_music_changer.types import FileType, FileTypeString, CompressorOption, CompressorOptionString
+from EE2_music_changer.utils.paths_handler import (
     get_platform_start_path,
     check_create_custom_dir,
     is_game_folder_selected,
 )
-from ..utils.files_handler import get_music_files, get_music_files_paths
-from ..utils.files_replacer import replace_music
-from ..utils.audio_compressor import CompressorOptionSelector
+from EE2_music_changer.utils.files_handler import get_music_files, get_music_files_paths
+from EE2_music_changer.utils.files_replacer import replace_music
+from EE2_music_changer.utils.audio_compressor import CompressorOptionSelector
+from .base_callbacks_handler import _BaseCallbackHandler
 
 
 def has_same_names(game_files: List[str], custom_files: List[str]) -> bool:
     return not all(custom_file in game_files for custom_file in custom_files)
 
 
-class CallbackHandler(ft.UserControl):
+class CallbackHandler(_BaseCallbackHandler):
     DARK_MODE: str = "Dark Mode"
     LIGHT_MODE: str = "Light Mode"
     GAME_FILE: FileTypeString = FileType.GAME
@@ -48,7 +49,7 @@ class CallbackHandler(ft.UserControl):
         try:
             self._change(game_input_path, custom_path_input)
         except IndexError:
-            self._info_alert_dialog(
+            self._show_alert_dialog(
                 self.ERROR_DIALOG,
                 "Invalid or empty game music path! \nTry to set it manually.",
             )
@@ -78,7 +79,7 @@ class CallbackHandler(ft.UserControl):
                 self.music_path, self.music_files_paths, self.custom_files_paths
             )[0]
 
-            self._info_alert_dialog(
+            self._show_alert_dialog(
                 self.SUCCESS_DIALOG,
                 f"{self.replace_counter} file(s) was/were successfully replaced.",
             )
@@ -93,7 +94,7 @@ class CallbackHandler(ft.UserControl):
         else:
             return True
 
-        self._info_alert_dialog(self.ERROR_DIALOG, message)
+        self._show_alert_dialog(self.ERROR_DIALOG, message)
         return False
 
     def _rename_option_select(self) -> None:
@@ -120,7 +121,7 @@ class CallbackHandler(ft.UserControl):
             self.custom_files_paths,
             self.change_button_option,
         )
-        self._info_alert_dialog(
+        self._show_alert_dialog(
             self.SUCCESS_DIALOG,
             f"{self.replace_counter[0]} file(s) was/were successfully "
             f"replaced and {self.replace_counter[1]} renamed.",
@@ -133,7 +134,7 @@ class CallbackHandler(ft.UserControl):
         self.replace_counter = replace_music(
             self.music_path, self.music_files_paths, self.custom_files_paths
         )
-        self._info_alert_dialog(
+        self._show_alert_dialog(
             self.SUCCESS_DIALOG,
             f"{self.replace_counter[0]} file(s) was/were successfully replaced.",
         )
@@ -152,7 +153,7 @@ class CallbackHandler(ft.UserControl):
         try:
             self._reset(game_input_path)
         except IndexError:
-            self._info_alert_dialog(
+            self._show_alert_dialog(
                 self.ERROR_DIALOG,
                 "Invalid or empty music game path! \nTry to set it manually.",
             )
@@ -165,12 +166,12 @@ class CallbackHandler(ft.UserControl):
         if os.path.exists(music_path):
             option_selector = CompressorOptionSelector()
             option_selector.select(self.RESET, game_music_path=music_path)
-            self._info_alert_dialog(
+            self._show_alert_dialog(
                 self.SUCCESS_DIALOG,
                 f"{GAME_MUSIC_NUMBER} files were successfully replaced.",
             )
         else:
-            self._info_alert_dialog(self.ERROR_DIALOG, "Invalid game path selected!")
+            self._show_alert_dialog(self.ERROR_DIALOG, "Invalid game path selected!")
 
     def game_path_button_callback(
         self,
@@ -231,38 +232,10 @@ class CallbackHandler(ft.UserControl):
                 selected_path, MUSIC_FOLDER_NAME, AMBIENT_FOLDER_NAME
             )
         else:
-            self._info_alert_dialog(
+            self._show_alert_dialog(
                 self.ERROR_DIALOG,
                 "Game music path is invalid! Selected path does not contain necessary game structure.",
             )
             input_path.value = "INVALID SELECTED PATH"
         self.update()
 
-    def _theme_change(
-        self,
-        checkbox: ft.Checkbox,
-        theme_mode: ft.ThemeMode,
-        mode_label: str,
-    ) -> None:
-        checkbox.label = mode_label
-        self.page.theme_mode = theme_mode
-
-    def _info_alert_dialog(self, title: str, message: str) -> ft.AlertDialog:
-        dialog = ft.AlertDialog(
-            title=ft.Text(title),
-            content=ft.Text(message),
-            actions=[
-                ft.TextButton(
-                    "Ok",
-                    on_click=lambda _: (
-                        setattr(dialog, "open", False),
-                        self.page.update(),
-                    ),
-                ),
-            ],
-            actions_alignment=ft.MainAxisAlignment.END,
-        )
-        self.page.dialog = dialog
-        dialog.open = True
-        self.page.update()
-        return dialog

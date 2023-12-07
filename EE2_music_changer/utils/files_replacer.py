@@ -12,7 +12,11 @@ REPLACER_LOGGER = CustomLogger("REPLACER_LOGGER")
 
 def set_replace_music_value(custom_files: List[str]) -> int:
     custom_music_number = len(custom_files)
-    return GAME_MUSIC_NUMBER if custom_music_number >= GAME_MUSIC_NUMBER else custom_music_number
+    return (
+        GAME_MUSIC_NUMBER
+        if custom_music_number >= GAME_MUSIC_NUMBER
+        else custom_music_number
+    )
 
 
 def replace_file(input_path: str, output_path: str) -> None:
@@ -28,10 +32,10 @@ def rename_music(custom_music_path: str, game_music_path: str) -> str:
 
 
 def replace_music(
-        game_music_dir_path: str,
-        game_files_paths: List[str],
-        custom_files_paths: List[str],
-        rename_flag: Optional[bool] = None,
+    game_music_dir_path: str,
+    game_files_paths: List[str],
+    custom_files_paths: List[str],
+    rename_flag: Optional[bool] = None,
 ) -> Tuple[int, int]:
     replace_music_value = set_replace_music_value(custom_files_paths)
     renamed_count = 0
@@ -55,7 +59,9 @@ def replace_music(
             replace_file(custom_music_path, game_music_path)
 
             if rename_flag:
-                renamed_custom_music_path = rename_music(custom_music_path, game_music_path)
+                renamed_custom_music_path = rename_music(
+                    custom_music_path, game_music_path
+                )
                 renamed_count += 1
                 REPLACER_LOGGER.show_info(
                     "Renamed file #%d: from '%s' to '%s'",
@@ -66,8 +72,6 @@ def replace_music(
 
         game_files_paths_copy.remove(game_music_path)
 
-        REPLACER_LOGGER.show_info(
-            "Replaced file #%d: %s", (index + 1), game_music_path
-        )
+        REPLACER_LOGGER.show_info("Replaced file #%d: %s", (index + 1), game_music_path)
 
     return replace_music_value, renamed_count
